@@ -1,4 +1,5 @@
 name: CI
+
 on:
   push:
     branches: [ "main" ]
@@ -13,8 +14,8 @@ jobs:
       - name: Build image
         run: docker build -t airline-edition .
 
-      - name: Smoke test (direct pipeline)
+      - name: Smoke test
         run: |
           mkdir -p out_demo
           docker run --rm -v "$PWD/out_demo:/app/out_demo" airline-edition \
-            python simulations/run_full_pipeline.py --out /app/out_demo --run-id ci_smoke --flights 2 --tickets-per-flight 2 --seed 123
+            smoke-test --out /app/out_demo --run-id ci_smoke
