@@ -27,3 +27,8 @@ pitch_pack/
 *.bak
 *.bak.*
 *~
+
+# pitch artifacts (never commit)
+airline-edition-*-pitch.zip
+airline-edition-latest-pitch.zip
+pitch_pack/
