@@ -17,5 +17,7 @@ jobs:
       - name: Smoke test
         run: |
           mkdir -p out_demo
-          docker run --rm -v "$PWD/out_demo:/app/out_demo" airline-edition \
-            smoke-test --out /app/out_demo --run-id ci_smoke
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "$PWD/out_demo:/app/out_demo" \
+            airline-edition smoke-test --out /app/out_demo --run-id ci_smoke
