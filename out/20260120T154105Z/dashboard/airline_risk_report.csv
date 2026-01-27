@@ -1,2 +1,0 @@
-flight,class,mean_revenue,revenue_std,ci_lower_95,ci_upper_95,VaR_95,CVaR_95
-FL-1001,economy,22000,400,21200,22800,21500,21300

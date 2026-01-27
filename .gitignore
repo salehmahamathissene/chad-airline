@@ -1,3 +1,24 @@
-.archive/
-logs/
-*.save*
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual envs
+.venv/
+venv/
+
+# Outputs / artifacts
+out/
+out_demo/
+client_outputs/
+pitch_pack/
+*.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
