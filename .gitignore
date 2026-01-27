@@ -22,3 +22,8 @@ pitch_pack/
 .DS_Store
 .idea/
 .vscode/
+
+# backups
+*.bak
+*.bak.*
+*~
