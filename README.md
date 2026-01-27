@@ -25,3 +25,20 @@ It answers business questions like:
 ### Build
 ```bash
 docker build -t airline-edition .
+
+## 📬 Contact
+
+If you are interested in:
+- Airline risk analytics
+- Monte Carlo KPI dashboards
+- Executive-ready financial simulations
+- Audit-grade decision systems
+
+📧 Email: **salehmahamathissene@gmail.com**  
+🐙 GitHub: https://github.com/salehmahamathissene
+
+Please include:
+- Who you are
+- What you need
+- Timeline (if any)
+
