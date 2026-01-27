@@ -1,51 +1,35 @@
-# Airline Edition — Risk & Revenue Simulation Engine (Audit-Grade)
-## Demo & Contact
+# Chad-Airline  
+## Audit-Grade Airline Risk & Revenue Simulation Engine
 
-📧 Email: salehmahamathissene@gmail.com  
-🐙 GitHub: https://github.com/salehmahamathissene/chad-airline  
+**Quantify airline revenue, disruption risk, and executive decisions using Monte-Carlo simulation.**
 
-For demos, pilot projects, or licensing, contact directly by email.
+---
 
+## What this is
+A production-ready simulation engine that generates:
+- CEO-ready Executive PDF
+- Probability of loss, RAROC, stress tests
+- Reproducible dashboards and audit logs
 
-## What it does
-This engine simulates airline ticket and flight operational scenarios (normal + disruption), then produces:
-- Executive PDF report (risk, revenue, loss probability, KPIs)
-- Traceable event logs (audit-grade replay)
-- Dashboard-ready CSVs and plots
+Built for **airlines, insurers, auditors, and aviation consultants**.
 
-## Who pays for this
-- Airlines (Revenue Management, Risk, Ops, Compliance)
-- Aviation consultancies
-- Insurers / auditors (risk quantification)
+---
 
-## Why it is valuable
-It answers business questions like:
-- “What is the probability of loss under disruption?”
-- “What is our VaR / CVaR under stress scenarios?”
-- “What decision policy reduces denied boarding losses?”
+## Problems it solves
+- What is the probability of loss under disruption?
+- Which boarding policy minimizes denied-boarding cost?
+- How does stress affect RAROC and fleet decisions?
 
-## Demo (one command)
+---
+
+## What you get
+- One-command Docker demo
+- Executive-grade PDF report
+- CSVs, charts, and explainability logs
+- Deterministic, auditable results
+
+---
+
+## Run a demo
 ```bash
-./scripts/demo.sh
-## Quick Start (Docker)
-
-### Build
-```bash
-docker build -t airline-edition .
-
-## 📬 Contact
-
-If you are interested in:
-- Airline risk analytics
-- Monte Carlo KPI dashboards
-- Executive-ready financial simulations
-- Audit-grade decision systems
-
-📧 Email: **salehmahamathissene@gmail.com**  
-🐙 GitHub: https://github.com/salehmahamathissene
-
-Please include:
-- Who you are
-- What you need
-- Timeline (if any)
-
+docker run --rm airline-edition smoke-test
