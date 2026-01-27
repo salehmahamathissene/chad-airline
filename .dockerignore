@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# venv
+.venv/
+venv/
+
+# outputs
+out/
+logs/
+logs_monte_carlo/
+logs_monte_carlo_dashboard/
+
+# git
+.git/
+.gitignore
+
+# editor
+*.swp
+*.swo
+.DS_Store

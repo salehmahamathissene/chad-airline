@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chad-airline-engine"
+version = "1.0.0"
+description = "CHAD-AIRLINE Simulation Engine"
+requires-python = ">=3.10"
+
+[project.scripts]
+chad-airline-engine = "cli:main"

@@ -1,0 +1,26 @@
+@classmethod
+def save_event(cls, aggregate_id, event):
+    """
+    Compatibility alias.
+    Some simulation scripts call save_event(), while the repository may expose
+    append(), add(), store(), or record(). We route to the correct one.
+    """
+    if hasattr(cls, "append_event"):
+        return cls.append_event(aggregate_id, event)
+    if hasattr(cls, "append"):
+        return cls.append(aggregate_id, event)
+    if hasattr(cls, "add_event"):
+        return cls.add_event(aggregate_id, event)
+    if hasattr(cls, "add"):
+        return cls.add(aggregate_id, event)
+    if hasattr(cls, "store_event"):
+        return cls.store_event(aggregate_id, event)
+    if hasattr(cls, "store"):
+        return cls.store(aggregate_id, event)
+    if hasattr(cls, "record_event"):
+        return cls.record_event(aggregate_id, event)
+
+    raise AttributeError(
+        "EventRepository has no known event writer method "
+        "(expected one of: append_event/append/add_event/add/store_event/store/record_event)"
+    )

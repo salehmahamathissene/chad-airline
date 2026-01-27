@@ -1,0 +1,44 @@
+from domain.common.identifiers import FlightId
+from domain.flight.events import FlightCreated, FlightDelayed
+from domain.flight.model import Flight
+from datetime import timedelta
+
+def simulate_event_driven_airline(num_flights: int, tickets_per_flight: int):
+    flights = []
+
+    for i in range(num_flights):
+        flight_events = []
+
+        flight_id = FlightId(f"FL-{i+1:03d}")
+
+        departure_time = clock.now() + timedelta(hours=i)
+
+        flight_events.append(
+            FlightCreated(
+                occurred_at=clock.now(),
+                flight_id=flight_id,
+                origin="KGL",
+                destination="CDG",
+                scheduled_departure=departure_time,
+            )
+        )
+
+        delay = random.choice([0, 15, 30])
+
+        if delay > 0:
+            flight_events.append(
+                FlightDelayed(
+                    occurred_at=clock.now(),
+                    flight_id=flight_id,
+                    delay_minutes=delay,
+                )
+            )
+
+        flight = Flight.rehydrate(flight_events)
+
+        # Projection (NOT domain state)
+        estimated_arrival = flight.scheduled_departure + timedelta(hours=8)
+
+        flights.append((flight, estimated_arrival))
+
+    return flights
