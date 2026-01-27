@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-VERSION = "1.0.0"
+VERSION = "1.0.5"
 
 
 # ---------------------------
