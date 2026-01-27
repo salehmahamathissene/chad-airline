@@ -20,3 +20,8 @@ It answers business questions like:
 ## Demo (one command)
 ```bash
 ./scripts/demo.sh
+## Quick Start (Docker)
+
+### Build
+```bash
+docker build -t airline-edition .
