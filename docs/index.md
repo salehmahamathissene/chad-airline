@@ -1,4 +1,3 @@
-cat > docs/index.md <<'EOF'
 # Chad-Airline — Audit-Grade Airline Risk & Revenue Engine
 
 **Quantify airline revenue, disruption risk, and executive decisions using Monte-Carlo simulation.**
@@ -34,3 +33,9 @@ Built for **airlines, insurers, auditors, and aviation consultants**.
 ```bash
 docker build -t airline-edition .
 docker run --rm airline-edition smoke-test
+```
+
+---
+
+## Contact
+📧 **salehmahamathissene@gmail.com**
