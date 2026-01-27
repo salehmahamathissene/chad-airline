@@ -13,9 +13,13 @@ import pandas as pd
 
 # Headless-safe charts in Docker
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+
+VERSION = "1.0.0"
+STRICT_MIN_ROWS = 10
 
 # CSVs expected by CEO PDF
 REQUIRED_CSVS = [
@@ -113,7 +117,12 @@ def run_script(
         if log_file is not None:
             _append_log(
                 log_file,
-                "\n" + "=" * 90 + "\n" + f"TIME: {utc_now_str()}\n" + f"CMD : {' '.join(cmd)}\n" + f"EXC : {e}\n"
+                "\n"
+                + "=" * 90
+                + "\n"
+                + f"TIME: {utc_now_str()}\n"
+                + f"CMD : {' '.join(cmd)}\n"
+                + f"EXC : {e}\n"
             )
         return 1
 
@@ -145,7 +154,11 @@ def ensure_symlink(link_path: Path, target_dir: Path, *, log_file: Path | None =
         if log_file is not None:
             _append_log(
                 log_file,
-                "\n" + "=" * 90 + "\n" + f"TIME: {utc_now_str()}\n" + f"SYMLINK: {link_path} -> {target_dir}\n",
+                "\n"
+                + "=" * 90
+                + "\n"
+                + f"TIME: {utc_now_str()}\n"
+                + f"SYMLINK: {link_path} -> {target_dir}\n",
             )
 
     except Exception as e:
@@ -181,6 +194,17 @@ def copy_if_exists(src: Path, dst: Path) -> bool:
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
         return True
+    except Exception:
+        return False
+
+
+def contains_placeholder_marker(path: Path) -> bool:
+    """
+    STRICT quality gate: detect placeholder text even if rows > threshold.
+    """
+    try:
+        txt = path.read_text(encoding="utf-8", errors="ignore").lower()
+        return "placeholder" in txt
     except Exception:
         return False
 
@@ -288,6 +312,7 @@ def _write_run_metadata(run_dir: Path, *, run_id: str, flights: int, tickets_per
     meta = run_dir / "RUN_METADATA.txt"
     lines = [
         "CHAD-AIRLINE RUN METADATA",
+        f"version={VERSION}",
         f"time_utc={utc_now_str()}",
         f"run_id={run_id}",
         f"flights={flights}",
@@ -444,7 +469,6 @@ def main() -> int:
     ap.add_argument("--flights", type=int, default=10)
     ap.add_argument("--tickets-per-flight", type=int, default=5)
     ap.add_argument("--seed", type=int, default=None, help="Optional deterministic seed (exported via env).")
-
     ap.add_argument(
         "--strict",
         action="store_true",
@@ -506,20 +530,29 @@ def main() -> int:
             rc_any = rc_any or rc
             print(f"⚠️ {Path(script).name} failed — continuing (sellable mode). See {debug_log}")
 
+    # ---------------------------------------------------------------------
+    # Deterministic artifact copy (NO GLOBS)
+    # ---------------------------------------------------------------------
+    copied_files: list[str] = []
+    missing_files: list[str] = []
+
     # Copy required CSVs from legacy into dashboard
-    copied = 0
     for csv_name in ALL_REQUIRED:
         src = legacy_dir / csv_name
         dst = dashboard_dir / csv_name
         if copy_if_exists(src, dst):
-            copied += 1
+            copied_files.append(f"dashboard/{csv_name}")
+        else:
+            missing_files.append(f"legacy/{csv_name}")
 
-    # Copy any PDFs already present
-    for pdf in reports_dir.glob("*.pdf"):
-        if copy_if_exists(pdf, dashboard_dir / pdf.name):
-            copied += 1
-
-    print(f"✅ Copied {copied} report file(s) into dashboard/")
+    print(f"✅ Copied {len(copied_files)} required CSV(s) into dashboard/")
+    if copied_files:
+        for f in sorted(copied_files):
+            print(f"   - {f}")
+    if missing_files:
+        print("⚠️ Missing CSV(s) from legacy (placeholders may be created):")
+        for f in sorted(missing_files):
+            print(f"   - {f}")
 
     # Ensure CSVs exist and readable (placeholders if needed)
     write_or_repair_placeholders(dashboard_dir)
@@ -540,9 +573,10 @@ def main() -> int:
     if rc_pdf != 0:
         print(f"⚠️ CEO PDF generator failed — continuing (sellable mode). See {debug_log}")
 
-    # After PDF, copy again if created
-    for pdf in reports_dir.glob("*.pdf"):
-        copy_if_exists(pdf, dashboard_dir / pdf.name)
+    # Deterministic: copy only the CEO PDF into dashboard (no glob)
+    pdf_path = reports_dir / "EXECUTIVE_REPORT.pdf"
+    if copy_if_exists(pdf_path, dashboard_dir / pdf_path.name):
+        print(f"✅ Copied CEO PDF into dashboard/{pdf_path.name}")
 
     # Artifact Summary + strict validation
     print("\n📦 RUN ARTIFACT SUMMARY")
@@ -551,12 +585,16 @@ def main() -> int:
     for name in ALL_REQUIRED:
         f = dashboard_dir / name
         rows = csv_rowcount(f) if f.exists() else 0
-        status = "OK" if rows > 10 else "PLACEHOLDER/SMALL"
+        placeholder_flag = contains_placeholder_marker(f) if f.exists() else True
+        status = "OK" if (rows > STRICT_MIN_ROWS and not placeholder_flag) else "PLACEHOLDER/SMALL"
         print(f" - {name:<35} rows={rows:<6} status={status}")
-        if args.strict and rows <= 10:
-            problems.append(f"{name} has only {rows} rows (expected > 10)")
 
-    pdf_path = reports_dir / "EXECUTIVE_REPORT.pdf"
+        if args.strict:
+            if rows <= STRICT_MIN_ROWS:
+                problems.append(f"{name} has only {rows} rows (expected > {STRICT_MIN_ROWS})")
+            if placeholder_flag:
+                problems.append(f"{name} contains placeholder marker")
+
     if pdf_path.exists() and pdf_path.stat().st_size > 1000:
         print(" - EXECUTIVE_REPORT.pdf                     status=OK")
     else:

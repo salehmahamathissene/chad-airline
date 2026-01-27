@@ -1,22 +1,27 @@
 FROM python:3.12-slim
 
-WORKDIR /app
+LABEL org.opencontainers.image.title="Airline Edition — Risk & Revenue Simulation Engine"
+LABEL org.opencontainers.image.version="1.0.x"
+LABEL org.opencontainers.image.description="Monte Carlo → Risk → Board → Execution → CEO PDF (audit-grade artifacts)"
+LABEL org.opencontainers.image.licenses="Proprietary"
 
-# Faster, cleaner logs
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app
+
+WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app
 
-RUN useradd -m appuser && chown -R appuser:appuser /app
+# Create non-root user + ensure output dir exists
+RUN useradd -m appuser \
+ && mkdir -p /app/out_demo \
+ && chown -R appuser:appuser /app
+
 USER appuser
 
-# CLI as entrypoint (professional)
 ENTRYPOINT ["python", "-m", "cli"]
-
-# Default action: run demo pipeline inside container
-CMD ["run", "--out", "/app/out_demo/demo_001", "--run-id", "demo_001", "--flights", "10", "--tickets-per-flight", "5", "--strict"]
+CMD ["run", "--out", "/app/out_demo", "--run-id", "demo_001", "--flights", "10", "--tickets-per-flight", "5", "--strict"]

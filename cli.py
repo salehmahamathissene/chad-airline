@@ -79,13 +79,16 @@ class ValidationResult:
 
 def strict_validate(run_dir: Path, *, min_rows: int = 10) -> ValidationResult:
     """
-    Professional validation:
-    - CEO PDF exists and is not tiny
-    - key CSVs exist and have > min_rows rows
+    Professional strict validation (matches run_full_pipeline.py strict gates):
+    - CEO PDF exists and not tiny
+    - required CSVs exist, have > min_rows rows
+    - required CSVs must NOT contain "placeholder" marker
+    - at least 1 chart exists in dashboard/images
     """
     dashboard = run_dir / "dashboard"
     reports = run_dir / "reports"
     pdf = reports / "EXECUTIVE_REPORT.pdf"
+    images_dir = dashboard / "images"
 
     required_csvs = [
         "airline_risk_report.csv",
@@ -96,6 +99,13 @@ def strict_validate(run_dir: Path, *, min_rows: int = 10) -> ValidationResult:
         "airline_execution_plan.csv",
         "airline_decision_explainability_report.csv",
     ]
+
+    def has_placeholder_marker(p: Path) -> bool:
+        try:
+            txt = p.read_text(encoding="utf-8", errors="ignore").lower()
+            return "placeholder" in txt
+        except Exception:
+            return True
 
     issues: list[str] = []
     per_file: dict[str, dict[str, object]] = {}
@@ -119,13 +129,29 @@ def strict_validate(run_dir: Path, *, min_rows: int = 10) -> ValidationResult:
         p = dashboard / name
         if not p.exists():
             issues.append(f"Missing {name}")
-            per_file[name] = {"exists": False, "rows": 0}
+            per_file[name] = {"exists": False, "rows": 0, "placeholder": True}
             continue
 
         rows = csv_rows(p)
-        per_file[name] = {"exists": True, "rows": rows}
+        placeholder = has_placeholder_marker(p)
+        per_file[name] = {"exists": True, "rows": rows, "placeholder": placeholder}
+
         if rows <= min_rows:
             issues.append(f"{name} has only {rows} rows (expected > {min_rows})")
+        if placeholder:
+            issues.append(f"{name} contains placeholder marker")
+
+    # Charts check
+    pngs = []
+    try:
+        if images_dir.exists():
+            pngs = list(images_dir.glob("*.png"))
+    except Exception:
+        pngs = []
+
+    per_file["dashboard/images"] = {"pngs": len(pngs)}
+    if len(pngs) <= 0:
+        issues.append("No charts found in dashboard/images/*.png")
 
     summary = {
         "run_dir": str(run_dir),
