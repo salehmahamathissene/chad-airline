@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t airline-edition .
+
+      - name: Smoke test
+        run: |
+          mkdir -p out_demo
+          docker run --rm -v "$PWD/out_demo:/app/out_demo" airline-edition \
+            smoke-test --out /app/out_demo --run-id ci_smoke
