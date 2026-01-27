@@ -1,4 +1,11 @@
 # Airline Edition — Risk & Revenue Simulation Engine (Audit-Grade)
+## Demo & Contact
+
+📧 Email: salehmahamathissene@gmail.com  
+🐙 GitHub: https://github.com/salehmahamathissene/chad-airline  
+
+For demos, pilot projects, or licensing, contact directly by email.
+
 
 ## What it does
 This engine simulates airline ticket and flight operational scenarios (normal + disruption), then produces:
