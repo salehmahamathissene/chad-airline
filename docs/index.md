@@ -30,12 +30,10 @@ Built for **airlines, insurers, auditors, and aviation consultants**.
 ---
 
 ## Run a demo
-```bash
-docker build -t airline-edition .
-docker run --rm airline-edition smoke-test
-```
+
 
 ---
 
 ## Contact
-📧 **salehmahamathissene@gmail.com**
+Email: salehmahamathissene@gmail.com
+GitHub: https://github.com/salehmahamathissene/chad-airline
